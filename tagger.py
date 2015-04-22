@@ -6,7 +6,6 @@ import re
 import operator
 
 class HMM(object):
-
 	def __init__(self, f):
 		self.emission_counts = defaultdict(int)
 		self.word_counts = defaultdict(int)
