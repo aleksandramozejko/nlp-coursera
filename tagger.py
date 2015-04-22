@@ -78,12 +78,3 @@ with open("gene.dev", "r") as test:
 		for word in sentence:
 		  	print word, "".join(simple_tagger(hmm, word))
 		print ''
-		
-
-
-
-
-
-
-
-
