@@ -6,6 +6,7 @@ import re
 import operator
 
 class HMM(object):
+
 	def __init__(self, f):
 		self.emission_counts = defaultdict(int)
 		self.word_counts = defaultdict(int)
@@ -36,6 +37,9 @@ class HMM(object):
 		else:
 			return word
 
+	def get_words(self):
+		return self.word_counts.keys()
+
 	def get_word_count(self,word):
 		return self.word_counts[word]
 				
@@ -60,21 +64,24 @@ def read_sentences(f):
 def simple_tagger(hmm, word):
 	probs = defaultdict(float)
 	for tag in hmm.tags:
-		probs[(word,tag)] = hmm.emission_prob(word, tag)
+		if word in hmm.get_words():
+			probs[(word,tag)] = hmm.emission_prob(word, tag)
+		else:
+			probs[(word,tag)] = hmm.emission_prob("_RARE_", tag)			
 	maxval = max(probs.iteritems(), key=operator.itemgetter(1))[1]
-	if maxval == 0.0:
-		return ["O"]
-	else:
-		argmax = [k[1] for k,v in probs.items() if v==maxval]
-		return argmax
+	argmax = [k[1] for k,v in probs.items() if v==maxval]
+	return argmax
 
 ###Usage example###
-with open("gene_new.counts", "r") as f, open("gene_infreq.train", "r") as train:
+with open("gene.ncounts", "r") as f, open("gene.train", "r") as train, open("gene.ntrain", "w") as ntrain:
 	hmm = HMM(f)
 
+#Mapping infrequent words to _RARE_ keyword
+#replace_infreq_words(hmm, train, ntrain)
+
 with open("gene.dev", "r") as test:
-	for sentence in read_sentences(test):
-		for word in sentence:
-		  	print word, "".join(simple_tagger(hmm, word))
-		print ''
+  for sentence in read_sentences(test):
+ 		for word in sentence:
+ 		  	print word, "".join(simple_tagger(hmm, word))
+ 		print ''
 		
